@@ -2,49 +2,76 @@
 #include <vector>
 #include <iomanip>
 #include <cmath>
+#include <algorithm>
 
 using namespace std;
 
-vector<double> gaussian_elimination(vector<vector<double>> A, vector<double> b) {
+vector<int> factorize_matrix(vector<vector<double>>& A) {
+    int n = A.size();
+    vector<int> P(n);
+    for (int i = 0; i < n; i++) {
+        P[i] = i;
+    }
+    for (int j = 0; j < n; j++) {
+        int pivot = j;
+        for (int i = j + 1; i < n; i++) {
+            if (abs(A[i][j]) > abs(A[pivot][j])) {
+                pivot = i;
+            }
+        }
+        if (pivot != j) {
+            swap(P[j], P[pivot]);
+            swap(A[j], A[pivot]);
+        }
+        for (int i = j + 1; i < n; i++) {
+            A[i][j] /= A[j][j];
+            for (int k = j + 1; k < n; k++) {
+                A[i][k] -= A[i][j] * A[j][k];
+            }
+        }
+    }
+    return P;
+}
+
+vector<double> gaussian_elimination(vector<vector<double>>& A, vector<double>& b) {
     int n = A.size();
 
+    // Факторизуем матрицу A и найдем вектор перестановок P
+    vector<int> P = factorize_matrix(A);
+
+    // Применим перестановки P к вектору b
     for (int i = 0; i < n; i++) {
-        // Поиск максимального элемента в столбце i
-        double max_el = abs(A[i][i]);
-        int max_row = i;
-        for (int j = i + 1; j < n; j++) {
-            if (abs(A[j][i]) > max_el) {
-                max_el = abs(A[j][i]);
-                max_row = j;
-            }
-        }
-
-        // Перестановка строки с максимальным элементом на i-ую строку
-        if (max_row != i) {
-            swap(A[i], A[max_row]);
-            swap(b[i], b[max_row]);
-        }
-
-        // Приведение матрицы к треугольному виду
-        for (int j = i + 1; j < n; j++) {
-            double f = A[j][i] / A[i][i];
-            b[j] -= f * b[i];
-            for (int k = i; k < n; k++) {
-                A[j][k] -= f * A[i][k];
-            }
+        if (P[i] != i) {
+            swap(b[i], b[P[i]]);
         }
     }
 
-    // Обратный ход
+    // Вычислим L и U
+    for (int k = 0; k < n; k++) {
+        for (int i = k + 1; i < n; i++) {
+            double alpha = A[i][k];
+            for (int j = k + 1; j < n; j++) {
+                A[i][j] -= alpha * A[k][j];
+            }
+            A[i][k] = alpha / A[k][k];
+        }
+    }
+
+    // Вычислим решение системы
+    for (int k = 0; k < n - 1; k++) {
+        for (int i = k + 1; i < n; i++) {
+            b[i] -= A[i][k] * b[k];
+        }
+    }
+
     vector<double> x(n);
-    for (int i = n - 1; i >= 0; i--) {
-        double sum = 0;
-        for (int j = i + 1; j < n; j++) {
-            sum += A[i][j] * x[j];
+    for (int k = n - 1; k >= 0; k--) {
+        x[k] = b[k];
+        for (int j = k + 1; j < n; j++) {
+            x[k] -= A[k][j] * x[j];
         }
-        x[i] = (b[i] - sum) / A[i][i];
+        x[k] /= A[k][k];
     }
-
     return x;
 }
 
@@ -189,8 +216,6 @@ void matrix_inverse(vector<vector<double>> A, vector<vector<double>>& A_inv) {
     }
 }
 
-void faktorization_matrix() {}
-
 void ExperimentOne() {
     system("cls");
     cout << "Эксперимент 1" << endl;
@@ -211,45 +236,74 @@ void ExperimentThree() {
 
 int main() {
     vector<double> x;
+    vector<int> fkt;
     vector<vector<double>> A_inv;
-    double det;
+    double det = 0;
     setlocale(LC_ALL, "ru");
+    srand(time(NULL));
     while (true) {
         unsigned sch;
         system("cls");
         sch = menu();
         if (sch == 0) {
             cout << "Вы ввели что-то не то" << endl;
+            system("pause");
         }
         else {
             if (sch == 1) {
                 system("cls");
+                uint16_t vb;
+                
                 int n;
                 cout << "Введите количество уравнений: ";
                 cin >> n;
                 vector<vector<double>> A(n, vector<double>(n));
                 vector<double> b(n);
-                cout << "Введите коэффициенты уравнений: " << endl;
-                for (int i = 0; i < n; i++) {
-                    for (int j = 0; j < n; j++) {
-                        cin >> A[i][j];
+                cout << "Как заполнить?" << endl;
+                cout << "1) автоматически\n" << "2) вручную" << endl;
+                cin >> vb;
+                if (vb > 2 || vb < 1) {
+                    cout << "вы ввели что-то не то";
+                    system("pause");
+                }
+                else {
+                    if (vb == 1) {
+                        for (int i = 0; i < n; i++) {
+                            for (int j = 0; j < n; j++) {
+                                A[i][j] = rand()%100;
+                            }
+                            b[i] = rand() % 100;
+                        }
                     }
-                    cin >> b[i];
+                    if (vb == 2) {
+                        cout << "Введите коэффициенты уравнений: " << endl;
+                        for (int i = 0; i < n; i++) {
+                            for (int j = 0; j < n; j++) {
+                                cin >> A[i][j];
+                            }
+                            cin >> b[i];
+                        }
+                    }
                 }
                 print_matrix_and_b(A, b);
                 x = gaussian_elimination(A, b);
                 det = determinant(A);
+                fkt = factorize_matrix(A);
                 matrix_inverse(A, A_inv);
                 system("pause");
             }
             if (sch == 2) {
-                faktorization_matrix();
+                system("cls");
+                for (int i = 0; i < fkt.size(); i++) {
+                    cout << fkt[i] << ' ';
+                }
+                system("pause");
             }
             if (sch == 3) {
                 system("cls");
                 cout << "решение: ";
                 for (int i = 0; i < x.size(); i++) {
-                    cout << x[i] << " ";
+                    cout << "x[" << i << "]=" << fixed << setprecision(2) << setw(5) << x[i] << endl;
                 }
                 cout << endl;
                 system("pause");

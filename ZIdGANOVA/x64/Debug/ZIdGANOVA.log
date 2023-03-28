@@ -1,6 +1,8 @@
 ﻿  ZIdGANOVA.cpp
-C:\Users\nik85\source\repos\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(9,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\nik85\source\repos\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(67,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\nik85\source\repos\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(78,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-C:\Users\nik85\source\repos\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(137,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
-  ZIdGANOVA.vcxproj -> C:\Users\nik85\source\repos\ZIdGANOVA\x64\Debug\ZIdGANOVA.exe
+C:\Users\nik85\OneDrive\Документы\GitHub\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(10,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\nik85\OneDrive\Документы\GitHub\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(37,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\nik85\OneDrive\Документы\GitHub\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(94,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\nik85\OneDrive\Документы\GitHub\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(105,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\nik85\OneDrive\Документы\GitHub\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(164,21): warning C4267: инициализация: преобразование из "size_t" в "int"; возможна потеря данных
+C:\Users\nik85\OneDrive\Документы\GitHub\ZIdGANOVA\ZIdGANOVA\ZIdGANOVA.cpp(243,15): warning C4244: аргумент: преобразование "time_t" в "unsigned int", возможна потеря данных
+  ZIdGANOVA.vcxproj -> C:\Users\nik85\OneDrive\Документы\GitHub\ZIdGANOVA\x64\Debug\ZIdGANOVA.exe
