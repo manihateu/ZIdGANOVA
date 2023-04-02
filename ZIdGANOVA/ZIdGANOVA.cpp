@@ -34,45 +34,10 @@ vector<int> factorize_matrix(vector<vector<double>>& A) {
 }
 
 vector<double> gaussian_elimination(vector<vector<double>>& A, vector<double>& b) {
-    int n = A.size();
+    for (auto k = 0; k < A.size(); k++) {
+        auto main_element = A[k][k];
 
-    // Факторизуем матрицу A и найдем вектор перестановок P
-    vector<int> P = factorize_matrix(A);
-
-    // Применим перестановки P к вектору b
-    for (int i = 0; i < n; i++) {
-        if (P[i] != i) {
-            swap(b[i], b[P[i]]);
-        }
     }
-
-    // Вычислим L и U
-    for (int k = 0; k < n; k++) {
-        for (int i = k + 1; i < n; i++) {
-            double alpha = A[i][k];
-            for (int j = k + 1; j < n; j++) {
-                A[i][j] -= alpha * A[k][j];
-            }
-            A[i][k] = alpha / A[k][k];
-        }
-    }
-
-    // Вычислим решение системы
-    for (int k = 0; k < n - 1; k++) {
-        for (int i = k + 1; i < n; i++) {
-            b[i] -= A[i][k] * b[k];
-        }
-    }
-
-    vector<double> x(n);
-    for (int k = n - 1; k >= 0; k--) {
-        x[k] = b[k];
-        for (int j = k + 1; j < n; j++) {
-            x[k] -= A[k][j] * x[j];
-        }
-        x[k] /= A[k][k];
-    }
-    return x;
 }
 
 void print_matrix_and_b(vector<vector<double>> A, vector<double> b) {
