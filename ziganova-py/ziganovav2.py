@@ -1,5 +1,5 @@
 import random
-
+import time
 import numpy as np
 
 def lu_factorization(A):
@@ -152,6 +152,43 @@ def pretty_print(arr):
         row_str = " ".join([str(elem) for elem in row])
         print(row_str)
 
+#first exprtiment
+def generate_system(n):
+    """
+    Generates a random linear system Ax = b with n equations.
+    Returns A and b.
+    """
+    A = np.random.rand(n, n)
+    b = np.random.rand(n)
+    return A, b
+
+def run_experiment():
+    """
+    Runs the experiment and prints the results table.
+    """
+    print("  n     Время    Погрешность      Теор. числ.    Реал. число")
+    print("------------------------------------------------------------")
+    for n in range(5, 101, 5):
+        A, b = generate_system(n)
+        
+        start_time = time.time()
+        x = solve_system_lu(A, b)
+        end_time = time.time()
+        time_elapsed = end_time - start_time
+        
+        theoretical_ops = n**3 / 3
+        actual_ops = solve_system_lu.num_operations
+        
+        error = np.linalg.norm(A @ x - b)
+        
+        print(f"{n:4}  {time_elapsed:7.5f}  {error:9.2e}  {theoretical_ops:15.2e}  {actual_ops:8}")
+    
+        solve_system_lu.num_operations = 0
+    print()
+    print("решение СЛАУ")
+    for i in range(len(x)):
+            print(x[i], " x[", i, "]")    
+
 print("введите уравнения - ")
 print("Кол-во уравнений - ")
 lenn = int(input())
@@ -187,4 +224,6 @@ while 1:
     if sch == 6:
         print(" Обращение через AX=E - ")
         pretty_print(invert_matrix_AXE(A))
+    if sch == 7:
+        run_experiment()
 
