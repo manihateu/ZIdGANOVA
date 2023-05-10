@@ -2,6 +2,7 @@ import random
 import time
 import numpy as np
 
+
 def lu_factorization(A):
     n = len(A)
     LU = np.copy(A)
@@ -13,10 +14,11 @@ def lu_factorization(A):
             P[[j, row_max], :] = P[[row_max, j], :]
         pivot = float(LU[j, j])
         LU = LU.astype(type(pivot))
-        for i in range(j+1, n):
-            LU[i,j:] -= LU[i,j]*LU[j,j:]/ pivot
-            LU[i,j] /= pivot
+        for i in range(j + 1, n):
+            LU[i, j:] -= LU[i, j] * LU[j, j:] / pivot
+            LU[i, j] /= pivot
     return P, LU
+
 
 def determinant_LU(A):
     n = len(A)
@@ -43,6 +45,7 @@ def determinant_LU(A):
     det = sign * np.prod(np.diag(U))
 
     return det
+
 
 def solve_system_lu(A, b):
     n = len(A)
@@ -71,6 +74,7 @@ def solve_system_lu(A, b):
 
     return x
 
+
 def invert_matrix_elem(A):
     n = len(A)
     A_aug = np.hstack((A, np.eye(n)))  # Augmented matrix [A | I]
@@ -92,11 +96,13 @@ def invert_matrix_elem(A):
     A_inv = A_aug[:, n:]
     return A_inv
 
+
 def invert_matrix_AXE(A):
     n = len(A)
     E = np.eye(n)
     X = np.linalg.solve(A, E)
     return X
+
 
 def menu():
     print("Лабораторный проект №1. Вариант 4. Разложение на основе гауссова исключения по столбцам")
@@ -135,6 +141,7 @@ def solve_system(A, b, n, auto_fill):
             b = np.array(list(map(float, input().split())))
     return A, b
 
+
 def print_matrix_with_b(A, b):
     n = len(A)
     for i in range(n):
@@ -152,7 +159,8 @@ def pretty_print(arr):
         row_str = " ".join([str(elem) for elem in row])
         print(row_str)
 
-#first exprtiment
+
+# first exprtiment
 def generate_system(n):
     """
     Generates a random linear system Ax = b with n equations.
@@ -162,6 +170,7 @@ def generate_system(n):
     b = np.random.rand(n)
     return A, b
 
+
 def run_experiment():
     """
     Runs the experiment and prints the results table.
@@ -170,24 +179,98 @@ def run_experiment():
     print("------------------------------------------------------------")
     for n in range(5, 101, 5):
         A, b = generate_system(n)
-        
+
         start_time = time.time()
         x = solve_system_lu(A, b)
         end_time = time.time()
         time_elapsed = end_time - start_time
-        
-        theoretical_ops = n**3 / 3
+
+        theoretical_ops = n ** 3 / 3
         actual_ops = solve_system_lu.num_operations
-        
+
         error = np.linalg.norm(A @ x - b)
-        
+
         print(f"{n:4}  {time_elapsed:7.5f}  {error:9.2e}  {theoretical_ops:15.2e}  {actual_ops:8}")
-    
+
         solve_system_lu.num_operations = 0
     print()
     print("решение СЛАУ")
     for i in range(len(x)):
-            print(x[i], " x[", i, "]")    
+        print(x[i], " x[", i, "]")
+
+
+def run_experiment2():
+    print("Результаты эксперимента:")
+    print("--------------------------------------------------")
+    print("Порядок  Время     Погрешность  Теор. операции  Реал. операции")
+    print("--------------------------------------------------")
+    for _ in range(10):
+        n = random.randint(5, 101)  # Генерация случайного числа n от 5 до 100
+        # Генерация плохо обусловленной матрицы A
+        A = np.random.rand(n, n)  # Случайная матрица
+        U, _, _ = np.linalg.svd(A)  # Разложение по сингулярным значениям
+        singular_values = np.logspace(0, -4, num=n)  # Сингулярные значения в убывающем порядке
+        A = U @ np.diag(singular_values) @ U.T  # Плохо обусловленная матрица
+        # Генерация вектора b
+        b = np.random.rand(n)
+        # Решение СЛАУ
+        start_time = time.time()
+        x = solve_system_lu(A, b)
+        end_time = time.time()
+        time_elapsed = end_time - start_time
+        # Вычисление погрешности решения СЛАУ
+        error = np.linalg.norm(A @ x - b)
+        theoretical_ops = n ** 3 / 3
+        actual_ops = solve_system_lu.num_operations
+        print(f"{n:8} {time_elapsed:8.5f} {error:12.2e} {theoretical_ops:15.2e} {actual_ops:14}")
+        solve_system_lu.num_operations = 0
+    print("--------------------------------------------------")
+    print("")
+
+def calculate_inverse_error(A, A_inv):
+    """
+    Вычисляет погрешность найденной обратной матрицы.
+    """
+    n = len(A)
+    error = np.linalg.norm(np.eye(n) - A @ A_inv)
+    return error
+
+
+def run_experiment3():
+    print("Результаты эксперимента:")
+    print("---------------------------------------------------------------------------")
+    print("Порядок  Время I   Время II  Погрешность I  Погрешность II  Реал. операции I  Реал. операции II  Теоретическое")
+    print("---------------------------------------------------------------------------")
+
+    for n in range(5, 101, 5):
+        A = np.random.rand(n, n)  # Генерация случайной матрицы A
+
+        # Обращение матрицы A с помощью элементарных преобразований
+        start_time_1 = time.time()
+        A_inv_1 = invert_matrix_elem(A)
+        end_time_1 = time.time()
+        time_elapsed_1 = end_time_1 - start_time_1
+        error_1 = calculate_inverse_error(A, A_inv_1)
+        actual_ops_1 = invert_matrix_elem.num_operations
+
+        # Обращение матрицы A с помощью AX = E
+        start_time_2 = time.time()
+        A_inv_2 = invert_matrix_AXE(A)
+        end_time_2 = time.time()
+        time_elapsed_2 = end_time_2 - start_time_2
+        error_2 = calculate_inverse_error(A, A_inv_2)
+        actual_ops_2 = invert_matrix_AXE.num_operations
+
+        theoretical_ops = n ** 3 / 3
+
+        print(f"{n:8} {time_elapsed_1:8.5f} {time_elapsed_2:8.5f} {error_1:14.2e} {error_2:16.2e} "
+              f"{actual_ops_1:17} {actual_ops_2:18} {theoretical_ops:15.2e}")
+
+        invert_matrix_elem.num_operations = 0
+        invert_matrix_AXE.num_operations = 0
+
+    print("---------------------------------------------------------------------------")
+    print("")
 
 print("введите уравнения - ")
 print("Кол-во уравнений - ")
@@ -226,4 +309,7 @@ while 1:
         pretty_print(invert_matrix_AXE(A))
     if sch == 7:
         run_experiment()
-
+    if sch == 8:
+        run_experiment2()
+    if sch == 9:
+        run_experiment3()
