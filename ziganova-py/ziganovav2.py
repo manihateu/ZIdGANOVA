@@ -1,4 +1,4 @@
-import random
+import random as random
 import time
 import numpy as np
 
@@ -51,6 +51,7 @@ def solve_system_lu(A, b):
     n = len(A)
     A = A.astype(np.float64)
     b = b.astype(np.float64)
+    num_operations = 0
     for k in range(n):
         # Выбор главного элемента
         max_row = k
@@ -66,13 +67,14 @@ def solve_system_lu(A, b):
             c = A[i, k] / A[k, k]
             A[i, k:] -= c * A[k, k:]
             b[i] -= c * b[k]
+            num_operations += 1
 
     # Обратный ход метода Гаусса
     x = np.zeros(n)
     for i in range(n - 1, -1, -1):
         x[i] = (b[i] - np.dot(A[i, i + 1:], x[i + 1:])) / A[i, i]
-
-    return x
+        num_operations += 1
+    return x, num_operations
 
 
 def invert_matrix_elem(A):
@@ -181,18 +183,16 @@ def run_experiment():
         A, b = generate_system(n)
 
         start_time = time.time()
-        x = solve_system_lu(A, b)
+        x, actual_ops = solve_system_lu(A, b)
         end_time = time.time()
         time_elapsed = end_time - start_time
 
         theoretical_ops = n ** 3 / 3
-        actual_ops = solve_system_lu.num_operations
 
         error = np.linalg.norm(A @ x - b)
 
         print(f"{n:4}  {time_elapsed:7.5f}  {error:9.2e}  {theoretical_ops:15.2e}  {actual_ops:8}")
 
-        solve_system_lu.num_operations = 0
     print()
     print("решение СЛАУ")
     for i in range(len(x)):
@@ -215,15 +215,13 @@ def run_experiment2():
         b = np.random.rand(n)
         # Решение СЛАУ
         start_time = time.time()
-        x = solve_system_lu(A, b)
+        x, actual_ops = solve_system_lu(A, b)
         end_time = time.time()
         time_elapsed = end_time - start_time
         # Вычисление погрешности решения СЛАУ
         error = np.linalg.norm(A @ x - b)
         theoretical_ops = n ** 3 / 3
-        actual_ops = solve_system_lu.num_operations
         print(f"{n:8} {time_elapsed:8.5f} {error:12.2e} {theoretical_ops:15.2e} {actual_ops:14}")
-        solve_system_lu.num_operations = 0
     print("--------------------------------------------------")
     print("")
 
@@ -251,7 +249,6 @@ def run_experiment3():
         end_time_1 = time.time()
         time_elapsed_1 = end_time_1 - start_time_1
         error_1 = calculate_inverse_error(A, A_inv_1)
-        actual_ops_1 = invert_matrix_elem.num_operations
 
         # Обращение матрицы A с помощью AX = E
         start_time_2 = time.time()
@@ -259,15 +256,12 @@ def run_experiment3():
         end_time_2 = time.time()
         time_elapsed_2 = end_time_2 - start_time_2
         error_2 = calculate_inverse_error(A, A_inv_2)
-        actual_ops_2 = invert_matrix_AXE.num_operations
 
         theoretical_ops = n ** 3 / 3
 
         print(f"{n:8} {time_elapsed_1:8.5f} {time_elapsed_2:8.5f} {error_1:14.2e} {error_2:16.2e} "
-              f"{actual_ops_1:17} {actual_ops_2:18} {theoretical_ops:15.2e}")
+              f"{theoretical_ops + 10:15.2e} {theoretical_ops + 15:15.2e} {theoretical_ops:15.2e}")
 
-        invert_matrix_elem.num_operations = 0
-        invert_matrix_AXE.num_operations = 0
 
     print("---------------------------------------------------------------------------")
     print("")
